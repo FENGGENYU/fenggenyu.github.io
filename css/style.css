@@ -902,7 +902,7 @@ p.test span {
     -moz-background-size: cover;
     -o-background-size: cover;
     -moz-background-size: cover;
-    position: relative;
+    /*position: relative;*/
 }
 
 .overlay-inner {
@@ -1698,12 +1698,18 @@ p.copy-right-grids a:hover {
 }
 
 h3.wthree_title {
-    font-size: 1.4em;
+    font-size: 1.2em;
     color: #000;
     font-weight: 500;
 }
 
 h3.wthree_title_bio {
+    font-size: 1.0em;
+    color: #000;
+    font-weight: 300;
+}
+
+h4.wthree_title {
     font-size: 1.0em;
     color: #000;
     font-weight: 300;
