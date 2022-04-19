@@ -1,0 +1,170 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <title>CAPRI-NET</title>
+</head>
+
+<body>
+  <div class="container">
+    <div style="text-align: center; margin-top: 100px;">
+      <h1> CAPRI-Net: Learning Compact CAD Shapes with Adaptive Primitive Assembly. </h1>
+      <div style="margin-top: 15px;">
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://fenggenyu.github.io/">Fenggen Yu<sup>1</sup></a> </span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://czq142857.github.io/">Zhiqin Chen<sup>1</sup></a> </span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://manyili12345.github.io/">Manyi Li<sup>1, 3</sup></a> </span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="">Aditya Sanghi<sup>2</sup></a> </span>
+      </div>
+      <div>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="">Hooman Shayani<sup>2</sup></a> </span>
+        <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://www.sfu.ca/~amahdavi/Home.html">Ali Mahdavi-Amiri<sup>1</sup></a> </span>
+        <span style="font-size: 1.3em;"><a href="https://www.cs.sfu.ca/~haoz/">Hao Zhang<sup>1</sup></a> </span>
+      </div>
+      <div style="margin-top: 15px;">
+        <span style="margin-right: 20px; font-size: 1.2em;"><sup>1</sup>Simon Fraser University</span>
+        <span style="margin-right: 20px; font-size: 1.2em;"><sup>2</sup>Autodesk AI Lab</span>
+        <span style="margin-right: 20px; font-size: 1.2em;"><sup>3</sup>Shandong University</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 15px; text-align: center;">
+      <span style="margin-right: 15px; font-size: 1.3em;"><a href="https://arxiv.org/abs/2104.05652">[Paper (CVPR 2022)]</a>
+        <a href="">[Code(coming soon)]</a> </span>
+    </div>
+
+    <div style="margin-top: 50px;">
+      <div class="text-center">
+        <img src="images/capri/teaser.png" width=100% class="img-fluid">
+      </div>
+      <div style="margin-top: 35px;">
+        <p>
+            Our network learns compact and interpretable implicit representations of 3D CAD shapes in the form of primitive assemblies via CSG operations, without any assembly supervision..
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: 30px;">
+      <h3 class="text-center">
+        Abstract
+      </h3>
+      <p style="font-style: italic; margin-bottom: 5px;">
+        We introduce CAPRI-Net, a self-supervised neural network for learning compact and interpretable implicit representations of 3D computer-aided design (CAD) models, in
+        the form of adaptive primitive assemblies. Given an input 3D shape, our network reconstructs it by an assembly of
+        quadric surface primitives via constructive solid geometry (CSG) operations. Without any ground-truth shape assemblies, our self-supervised network is trained with a reconstruction loss, leading to faithful 3D reconstructions with
+        sharp edges and plausible CSG trees. While the parametric nature of CAD models does make them more predictable
+        locally, at the shape level, there is much structural and topological variation, which presents a significant generalizability challenge to state-of-the-art neural models for 3D
+        shapes. Our network addresses this challenge by adaptive training with respect to each test shape, with which we finetune the network that was pre-trained on a model collection.
+        We evaluate our learning framework on both ShapeNet and
+        ABC, the largest and most diverse CAD dataset to date, in
+        terms of reconstruction quality, sharp edges, compactness,
+        and interpretability, to demonstrate superiority over current
+        alternatives for neural CAD reconstruction.
+      </p>
+    </div>
+
+    <div style="margin-top: 50px;">
+      <h3 class="text-center">
+        Method
+      </h3>
+      <div class="text-center">
+        <img src="images/capri/network.png" width=100% class="img-fluid">
+      </div>
+      <div style="margin-top: 35px;">
+        <p>
+            Overview of our network. Given an input 3D shape as a point cloud or voxels, we first map it into a latent code using an encoder. 
+            This latent code is used to predict \(p\) primitives with parameters included in \(\mathcal{P}\). 
+            For any query point \(\mathcal{q}_j\) packed in matrix \(\mathcal{Q}\), we can obtain the matrix \(\mathcal{D}\) indicating approximate signed distance from the query point to each primitive.
+            A selection matrix \(\mathcal{T}\) is used to select a small set of primitives from the primitive set to group convex shapes in matrix \(\mathcal{C}\) which indicates inside/outside values for query points w.r.t convex shapes. 
+            Then, we perform min operation on each half of \(\mathcal{C}\) (i.e. \(\mathcal{T}_{l}\) and \(\mathcal{T}_{r}\)) to union convex shapes into two (possibly) concave shapes and get inside/outside indication vectors \(\mathcal{a}_{l}\) and \(\mathcal{a}_{r}\) for left and right concave shapes. 
+            Finally, we perform a difference operation as \(\mathcal{a}_{l} - \mathcal{a}_{r}\) to obtain the final point-wise inside/outside indicator \(\mathcal{s}\). 
+            \(L_\mathcal{T}\), \(L_\mathcal{W}\), and \(L_{rec}\) are the loss functions we define for our network.
+           
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: 50px">
+      <h3 class="text-center">
+        Results
+      </h3>
+      <h4>Reconstructed Mesh Quality</h4>
+      <p> The output meshes from our method contain sharp edges
+        and regular surfaces as expected from performing the CSG </p>
+
+        <div style="margin-top: 35px; overflow:hidden;">
+          <div class="text-center" style="overflow:hidden;">
+            <div class="text-center" style="width: 25%; display: inline-block; float: left; overflow:hidden;">
+              <img src="images/capri/1.gif" width=100% class="img-fluid" style="display: inline-block; float: left">
+            </div>
+            <div class="text-center" style="width: 25%; display: inline-block; float: left; overflow:hidden;">
+                <img src="images/capri/2.gif" width=100% class="img-fluid" style="display: inline-block; float: left">
+            </div>
+            <div class="text-center" style="width: 25%; display: inline-block; float: left; overflow:hidden;">
+                <img src="images/capri/3.gif" width=100% class="img-fluid" style="display: inline-block; float: left">
+            </div>
+            <div class="text-center" style="width: 25%; display: inline-block; float: left; overflow:hidden;">
+                <img src="images/capri/4.gif" width=100% class="img-fluid" style="display: inline-block; float: left">
+            </div>
+          </div>
+        </div>
+    
+      <h4>Self-supervised learned CSG Tree</h4>
+        <p> CSG-based CAD mesh outputting process of our method. We assemble primitives into convex shapes and perform
+            CSG operations to output a CAD mesh</p>
+        <div class="text-center">
+          <img src="images/capri/csg-tree.png" width=100% class="img-fluid">
+        </div>
+
+      <h4>Comparison on ABC Dataset</h4>
+      <p>Visual comparisons between reconstruction results from point clouds (8,192 points) on ABC. Pay attention to the insets which
+        show noticeable surface artifacts from IM-Net and SIREN results, both at \({128}^{3}\) resolution. </p>
+      <div class="text-center">
+        <img src="images/capri/Comparison_PC.png" width=100% class="img-fluid">
+      </div>
+
+      <br>
+      <br>
+
+      <h4>Comparison on ShapeNet</h4>
+      <p>Visual comparisons between reconstruction results from
+        \({64}^{3}\) voxel inputs on ABC. We also show number of surface primitives (#P) and number of convexes (#C) reconstructed. As UCSG and CSG-Stump do not produce surface primitives, only
+        convex solids (e.g., boxes and spheres), we count the convexes.</p>
+      <div class="text-center">
+        <img src="images/capri/shapenet.png" width=100% class="img-fluid">
+      </div>
+    </div>
+
+    <div style="margin-top: 50px; margin-bottom: 30px;">
+      <h3 class="text-center">
+        Citation
+      </h3>
+      <div style="margin-top: 35px;">
+        <p>
+            @article{DBLP:journals/corr/abs-2104-05652, <br/>
+                author    = {Fenggen Yu and Zhiqin Chen and Manyi Li and Aditya Sanghi and Hooman Shayani and Ali Mahdavi{-}Amiri and Hao Zhang},<br/>
+                title     = {CAPRI-Net: Learning Compact CAD Shapes with Adaptive Primitive Assembly}, <br/>
+                year      = {2021}, <br/>
+                url       = {https://arxiv.org/abs/2104.05652}, <br/>
+                biburl    = {https://dblp.org/rec/journals/corr/abs-2104-05652.bib}, <br/>
+              }
+        </p>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+</html>
