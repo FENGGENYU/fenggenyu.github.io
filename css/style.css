@@ -527,6 +527,10 @@ li.icons a {
     padding: 0;
 }
 
+li.icons a.linkedin {
+    background: #0077B5;
+}
+
 li.icons a.face-bk {
     background: #3b5998;
 }
